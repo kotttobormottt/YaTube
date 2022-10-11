@@ -14,6 +14,7 @@ def paginator_func(post_list, request):
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
 
+
 @cache_page(20)
 def index(request):
     # Главная страница
@@ -23,6 +24,7 @@ def index(request):
         'page_obj': page_obj,
     }
     return render(request, 'posts/index.html', context)
+
 
 def group_posts(request, slug):
     # Страница с группами
@@ -34,6 +36,7 @@ def group_posts(request, slug):
         'page_obj': page_obj,
     }
     return render(request, 'posts/group_list.html', context)
+
 
 def profile(request, username):
     # Профиль пользователя
@@ -50,6 +53,7 @@ def profile(request, username):
     }
     return render(request, 'posts/profile.html', context)
 
+
 def post_detail(request, post_id):
     # Показывает пост
     post = get_object_or_404(Post, id=post_id)
@@ -61,6 +65,7 @@ def post_detail(request, post_id):
         'form': form,
     }
     return render(request, 'posts/post_detail.html', context)
+
 
 @login_required
 def post_create(request):
@@ -77,6 +82,7 @@ def post_create(request):
             'posts:profile', temp_form.author
         )
     return render(request, 'posts/create_post.html', {'form': form})
+
 
 @login_required
 def post_edit(request, post_id):
@@ -97,6 +103,7 @@ def post_edit(request, post_id):
         'form': form, 'is_edit': True, 'post': post
     })
 
+
 @login_required
 def add_comment(request, post_id):
     # Добавить комментарий
@@ -107,6 +114,7 @@ def add_comment(request, post_id):
         comment.post = get_object_or_404(Post, pk=post_id)
         comment.save()
     return redirect('posts:post_detail', post_id=post_id)
+
 
 @login_required
 def follow_index(request):
@@ -119,6 +127,7 @@ def follow_index(request):
     }
     return render(request, 'posts/follow.html', context)
 
+
 @login_required
 def profile_follow(request, username):
     follow_author = get_object_or_404(User, username=username)
@@ -130,6 +139,7 @@ def profile_follow(request, username):
             author=follow_author
         )
     return redirect('posts:profile', username)
+
 
 @login_required
 def profile_unfollow(request, username):
