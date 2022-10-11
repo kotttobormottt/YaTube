@@ -61,8 +61,7 @@ class PostPagesTests(TestCase):
         Follow_count = Follow.objects.count()
         self.authorized_client.post(
             reverse('posts:profile_follow',
-            kwargs={"username": str(PostPagesTests.user_two)},
-            )
+                    kwargs={"username": str(PostPagesTests.user_two)},)
         )
         self.assertEqual(Follow.objects.count(), Follow_count + 1)
         self.assertTrue(
@@ -75,14 +74,12 @@ class PostPagesTests(TestCase):
         """Авторизированный автор может отписаться от избранного автора."""
         self.authorized_client.post(
             reverse('posts:profile_follow',
-            kwargs={"username": str(PostPagesTests.user_two)},
-            )
+                    kwargs={"username": str(PostPagesTests.user_two)},)
         )
         Follow_count = Follow.objects.count()
         self.authorized_client.post(
             reverse('posts:profile_unfollow',
-            kwargs={"username": str(PostPagesTests.user_two)},
-            )
+                    kwargs={"username": str(PostPagesTests.user_two)},)
         )
         self.assertEqual(Follow.objects.count(), Follow_count - 1)
         self.assertFalse(
@@ -99,8 +96,7 @@ class PostPagesTests(TestCase):
         new_client.force_login(new_user)
         new_client.post(
             reverse('posts:profile_follow',
-            kwargs={"username": str(PostPagesTests.user_two)},
-            )
+                    kwargs={"username": str(PostPagesTests.user_two)},)
         )
         new_post = Post.objects.create(
             author=PostPagesTests.user_two,
