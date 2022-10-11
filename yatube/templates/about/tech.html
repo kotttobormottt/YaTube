@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+<style>
+  p {
+    text-indent: 20px;
+  }
+</style>
+<div class="container col-lg-9 col-sm-12">
+  <div class="row">
+    <center><h3>В данный момент я изучаю:</h3></center>
+    <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush"><br>
+        <li class="list-group-item">
+          <a href="https://www.python.org/"
+          target="_blank"><b>Python</b></a>
+        </li>
+        <li class="list-group-item">
+          <a href="https://www.djangoproject.com/"
+          target="_blank"><b>Django</b></a>
+        </li>
+        <li class="list-group-item">
+          <a href="https://webref.ru/html/"
+          target="_blank"><b>HTML5</b></a>
+        </li>
+        <li class="list-group-item">
+          <a href="https://webref.ru/css/"
+          target="_blank"><b>CSS3</b></a>
+        </li>
+        <li class="list-group-item">
+          <a href="https://habr.com/ru/post/463125/"
+          target="_blank"><b>ООП</b></a>
+        </li>
+        <li class="list-group-item">
+          <a href="https://www.sqlite.org/"
+          target="_blank"><b>SQLite</b></a>
+        </li>
+        <li class="list-group-item">
+          <a href="https://git-scm.com/book/ru/v2/"\
+          target="_blank"><b>Git</b></a>
+        </li>
+      </ul>
+    </aside>
+    <article class="col-12 col-md-9"><br>
+      <p>
+        Данные технологии я изучаю в международном сервисе онлайн-образования
+        "Яндекс.Практикум" на курсе <b>Python-разработчик плюс.</b>
+      </p>
+      <p>
+        <img src="/static/img/it.jpg"
+        width="200"
+        height="200"
+        class="center py-3"
+        alt="^_^">
+        <img src="/static/img/lang.jpg"
+        width="200"
+        height="200"
+        class="center py-3"
+        alt="^_^">
+        <img src="/static/img/func.jpg"
+        width="200"
+        height="200"
+        class="center py-3"
+        alt="^_^">
+      </p>
+    </article>
+  </div>
+</div>
+{% endblock %}
