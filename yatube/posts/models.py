@@ -1,8 +1,11 @@
-from core.models import CreatedModel
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from core.models import CreatedModel
+
 User = get_user_model()
+
+LIMIT_TEXT = 15
 
 
 class Group(models.Model):
@@ -53,7 +56,7 @@ class Post(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.text[:15]
+        return self.text[:LIMIT_TEXT]
 
     class Meta:
         ordering = ('-pub_date',)
@@ -81,10 +84,15 @@ class Comment(CreatedModel):
     )
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:LIMIT_TEXT]
+    
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
 
-class Follow(CreatedModel):
+class Follow(models.Model):
+    # Модель для подписки
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -95,3 +103,11 @@ class Follow(CreatedModel):
         on_delete=models.CASCADE,
         related_name='following'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='unique_following')
+        ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'

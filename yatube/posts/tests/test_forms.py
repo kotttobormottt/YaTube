@@ -70,10 +70,6 @@ class PostFormTests(TestCase):
             'posts:profile', kwargs={'username': PostFormTests.user.username}
         ))
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        post_first = Post.objects.first()
-        self.assertEqual(post_first.group, PostFormTests.group)
-        self.assertEqual(post_first.text, form_data['text'])
-        self.assertEqual(post_first.author, PostFormTests.user)
         post_latest = Post.objects.latest('id')
         self.assertEqual(post_latest.text, form_data['text'])
         self.assertEqual(post_latest.group.id, form_data['group'])

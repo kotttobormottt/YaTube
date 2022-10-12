@@ -37,11 +37,18 @@ class PostURLTests(TestCase):
             f"/posts/{int(self.post.pk)}/": "posts/post_detail.html",
             f"/posts/{int(self.post.pk)}/edit/": "posts/create_post.html",
             "/create/": "posts/create_post.html",
+            '/follow/': 'posts/follow.html',
+            '/unexisting_page/': 'core/404.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
+
+    def test_404(self):
+        """Если страница не найдена на сайте, возвращает код ответа 404"""
+        response = self.authorized_client.get("/404/")
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_access_guest(self):
         """URL-адрес доступен или нет не авторизированному пользователю."""
@@ -93,8 +100,3 @@ class PostURLTests(TestCase):
                 cache.clear()
                 response = self.authorized_client_no_posts.get(address)
                 self.assertEqual(response.status_code, code)
-
-    def test_404(self):
-        """Проверяем возвращает ли сервер код 404, если страница не найдена"""
-        response = self.client.get('/404/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
