@@ -85,7 +85,7 @@ class Comment(CreatedModel):
 
     def __str__(self):
         return self.text[:LIMIT_TEXT]
-    
+
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
