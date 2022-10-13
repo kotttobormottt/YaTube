@@ -40,6 +40,7 @@ class PostURLTests(TestCase):
             '/follow/': 'posts/follow.html',
             '/unexisting_page/': 'core/404.html',
         }
+        cache.clear()
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
@@ -58,13 +59,13 @@ class PostURLTests(TestCase):
             f"/profile/{self.user}/": HTTPStatus.OK,
             f"/posts/{int(self.post.pk)}/": HTTPStatus.OK,
             f"/posts/{int(self.post.pk)}/edit/": HTTPStatus.FOUND,
-            "/create/": HTTPStatus.FOUND,
+            "/create/": HTTPStatus.OK,
             "/unexisting_page/": HTTPStatus.NOT_FOUND,
         }
         for address, code in code_answer_for_users.items():
             with self.subTest(address=address):
                 cache.clear()
-                response = self.client.get(address)
+                response = self.authorized_client_no_posts.get(address)
                 self.assertEqual(response.status_code, code)
 
     def test_urls_uses_correct_access_auth(self):
@@ -80,7 +81,6 @@ class PostURLTests(TestCase):
         }
         for address, code in code_answer_for_users.items():
             with self.subTest(address=address):
-                cache.clear()
                 response = self.authorized_client.get(address)
                 self.assertEqual(response.status_code, code)
 
@@ -97,6 +97,5 @@ class PostURLTests(TestCase):
         }
         for address, code in code_answer_for_users.items():
             with self.subTest(address=address):
-                cache.clear()
                 response = self.authorized_client_no_posts.get(address)
                 self.assertEqual(response.status_code, code)

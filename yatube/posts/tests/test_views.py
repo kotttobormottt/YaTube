@@ -58,12 +58,12 @@ class PostPagesTests(TestCase):
 
     def test_follow_page_(self):
         """Авторизированный автор может подписаться на другого автора."""
-        Follow_count = Follow.objects.count()
+        follow_count = Follow.objects.count()
         self.authorized_client.post(
             reverse('posts:profile_follow',
                     kwargs={"username": str(PostPagesTests.user_two)},)
         )
-        self.assertEqual(Follow.objects.count(), Follow_count + 1)
+        self.assertEqual(Follow.objects.count(), follow_count + 1)
         self.assertTrue(
             Follow.objects.filter(
                 user=PostPagesTests.user, author=PostPagesTests.user_two
@@ -76,12 +76,12 @@ class PostPagesTests(TestCase):
             reverse('posts:profile_follow',
                     kwargs={"username": str(PostPagesTests.user_two)},)
         )
-        Follow_count = Follow.objects.count()
+        follow_count = Follow.objects.count()
         self.authorized_client.post(
             reverse('posts:profile_unfollow',
                     kwargs={"username": str(PostPagesTests.user_two)},)
         )
-        self.assertEqual(Follow.objects.count(), Follow_count - 1)
+        self.assertEqual(Follow.objects.count(), follow_count - 1)
         self.assertFalse(
             Follow.objects.filter(
                 user=PostPagesTests.user, author=PostPagesTests.user_two
@@ -111,29 +111,52 @@ class PostPagesTests(TestCase):
         self.assertNotIn(new_post, response.context["page_obj"].object_list)
 
 
-class PaginatorViewsTest(TestCase):
+class PaginatorViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create(username='auth')
-        cls.group = Group.objects.create(
-            title='Тестовое название группы',
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
+        cls.group_list = Group.objects.create(
+            title='Тестовая группа',
             slug='test_slug',
-            description='Тестовое описание группы',
+            description='Тестовое описание группы'
         )
-        paginator_objects = []
-        for i in range(10):
+        post_list = []
+        for i in range(0, 13):
             new_post = Post(
-                author=PaginatorViewsTest.user,
-                text='Тестовый пост' + str(i),
-                group=PaginatorViewsTest.group
+                text=f'Тестовый пост контент {i}',
+                group=cls.group_list,
+                author=cls.user
             )
-            paginator_objects.append(new_post)
-        Post.objects.bulk_create(paginator_objects)
+            post_list.append(new_post)
+        Post.objects.bulk_create(post_list)
 
-    def setUp(self):
-        self.unauthorized_client = Client()
+    def test_first_page(self):
+        """Тестируем первую страницу пагинатора."""
+        slug = self.group_list.slug
+        username = self.user.username
+        page_list = [
+            reverse('posts:index'),
+            reverse('posts:group_list', kwargs={'slug': slug}),
+            reverse('posts:profile', kwargs={'username': username})
+        ]
+        for page in page_list:
+            response = self.authorized_client.get(page)
+            self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_second_page_contains_three_records(self):
-        response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 10)
+    def test_second_page(self):
+        """Тестируем вторую страницу пагинатора."""
+        slug = self.group_list.slug
+        username = self.user.username
+        page_list = {
+            reverse('posts:index'),
+            reverse('posts:group_list', kwargs={'slug': slug}),
+            reverse('posts:profile', kwargs={'username': username})
+        }
+        count_posts = Post.objects.count()
+        count = count_posts - 10
+        for page in page_list:
+            response = self.authorized_client.get(page + '?page=2')
+            self.assertEqual(len(response.context['page_obj']), count)
