@@ -1,6 +1,7 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.core.cache import cache
+
 from ..models import Follow, Group, Post, User
 
 
@@ -120,15 +121,15 @@ class PaginatorViewTest(TestCase):
         cls.slug = 'slug_test'
         cls.user = User.objects.create_user(username=cls.user_name)
         cls.group = Group.objects.create(
-            title='Группа для паджинатора',
+            title='Группа для пагинатора',
             slug='slug_test',
-            description='Описание группы для паджинатора',
+            description='Описание группы для пагинатора',
         )
         cls.page_num = 1
         posts = [
             Post(
                 author=cls.user,
-                text=f'Пост паджинатора {i}',
+                text=f'Пост пагинатора {i}',
                 group=cls.group,
             ) for i in range(10 + cls.page_num)
         ]
@@ -144,7 +145,7 @@ class PaginatorViewTest(TestCase):
         self.guest_client = Client()
 
     def test_paginator_page_1(self):
-        """Проверяем паджинатор на 1-й странице"""
+        """Проверяем пагинатор на 1-й странице"""
         for name, kwarg in self.pages_to_check.items():
             with self.subTest(name=name):
                 response = self.guest_client.get(reverse(name, kwargs=kwarg))
@@ -152,7 +153,7 @@ class PaginatorViewTest(TestCase):
                 self.assertEqual(len(context), 10)
 
     def test_paginator_page_2(self):
-        """Проверяем паджинатор на 2-й странице"""
+        """Проверяем пагинатор на 2-й странице"""
         for name, kwarg in self.pages_to_check.items():
             with self.subTest(name=name):
                 response = self.guest_client.get(reverse(name, kwargs=kwarg),
