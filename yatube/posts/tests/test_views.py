@@ -1,6 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
-
+from django.core.cache import cache
 from ..models import Follow, Group, Post, User
 
 
@@ -115,48 +115,47 @@ class PaginatorViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create(username='auth')
-        cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.user)
-        cls.group_list = Group.objects.create(
-            title='Тестовая группа',
-            slug='test_slug',
-            description='Тестовое описание группы'
+        cache.clear()
+        cls.user_name = 'auth'
+        cls.slug = 'slug_test'
+        cls.user = User.objects.create_user(username=cls.user_name)
+        cls.group = Group.objects.create(
+            title='Группа для паджинатора',
+            slug='slug_test',
+            description='Описание группы для паджинатора',
         )
-        post_list = []
-        for i in range(0, 13):
-            new_post = Post(
-                text=f'Тестовый пост контент {i}',
-                group=cls.group_list,
-                author=cls.user
-            )
-            post_list.append(new_post)
-        Post.objects.bulk_create(post_list)
-
-    def test_first_page(self):
-        """Тестируем первую страницу пагинатора."""
-        slug = self.group_list.slug
-        username = self.user.username
-        page_list = [
-            reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': slug}),
-            reverse('posts:profile', kwargs={'username': username})
+        cls.page_num = 1
+        posts = [
+            Post(
+                author=cls.user,
+                text=f'Пост паджинатора {i}',
+                group=cls.group,
+            ) for i in range(10 + cls.page_num)
         ]
-        for page in page_list:
-            response = self.authorized_client.get(page)
-            self.assertEqual(len(response.context['page_obj']), 10)
-
-    def test_second_page(self):
-        """Тестируем вторую страницу пагинатора."""
-        slug = self.group_list.slug
-        username = self.user.username
-        page_list = {
-            reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': slug}),
-            reverse('posts:profile', kwargs={'username': username})
+        Post.objects.bulk_create(posts)
+        cls.pages_to_check = {
+            'posts:index': {},
+            'posts:group_list': {'slug': cls.slug},
+            'posts:profile': {'username': cls.user_name},
         }
-        count_posts = Post.objects.count()
-        count = count_posts - 10
-        for page in page_list:
-            response = self.authorized_client.get(page + '?page=2')
-            self.assertEqual(len(response.context['page_obj']), count)
+
+    def setUp(self):
+        """Создаем клиента"""
+        self.guest_client = Client()
+
+    def test_paginator_page_1(self):
+        """Проверяем паджинатор на 1-й странице"""
+        for name, kwarg in self.pages_to_check.items():
+            with self.subTest(name=name):
+                response = self.guest_client.get(reverse(name, kwargs=kwarg))
+                context = response.context['page_obj'].object_list
+                self.assertEqual(len(context), 10)
+
+    def test_paginator_page_2(self):
+        """Проверяем паджинатор на 2-й странице"""
+        for name, kwarg in self.pages_to_check.items():
+            with self.subTest(name=name):
+                response = self.guest_client.get(reverse(name, kwargs=kwarg),
+                                                 {'page': 2})
+                context = response.context['page_obj'].object_list
+                self.assertEqual(len(context), self.page_num)
