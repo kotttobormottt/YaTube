@@ -1,6 +1,7 @@
 Pet-project «YaTube»
 =====
-
+http://kotobormot.pythonanywhere.com/
+=====
 Описание проекта
 ----------
 Социальная сеть «YaTube» для публикации постов и картинок.
