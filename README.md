@@ -119,5 +119,5 @@ python3 yatube/manage.py migrate
 python3 manage.py runserver
 ```
 
-### Авторы:
+### Автор проекта:
 Андрей Жаров
